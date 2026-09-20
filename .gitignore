@@ -1,0 +1,26 @@
+# Runtime state: never committed (account ids, brand profile, generated images, post history)
+carousel/
+**/profile.json
+**/post-log.md
+**/COPY.md
+**/CAPTIONS.md
+*.png
+*.webp
+*.jpg
+*.jpeg
+
+# Credentials and transient upload URLs
+.env
+.env.*
+*token*
+*secret*
+*presigned*
+*.key
+
+# OS / editor / python
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+.vscode/
+.idea/

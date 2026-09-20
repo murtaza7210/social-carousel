@@ -1,0 +1,31 @@
+# Hermes agent profile: Social Media Manager
+#
+# VERIFY BEFORE INSTALL: mirror the field names of an existing live profile
+# (for example the "adnan" profile's profile.yaml) for anything Hermes reads
+# that is not listed here, in particular how skills are bound to a profile.
+# The `skills` block below is the intended binding; rename the key if the
+# live profiles use a different one.
+
+name: social-media-manager
+display_name: Social Media Manager
+role: >
+  Social media manager for Monk AI Studio. Turns a topic into a designed,
+  published carousel and reports verified live URLs.
+
+skills:
+  - name: social-carousel
+    path: ../../../skills/social-carousel/SKILL.md
+
+mcp_servers:
+  - name: higgsfield
+    url: https://mcp.higgsfield.ai/mcp
+  - name: blotato
+    url: https://mcp.blotato.com/mcp
+
+env:
+  CAROUSEL_HOME: ~/carousel
+
+defaults:
+  approval: review
+  linkedin_targets: [personal, company_page]
+  overlap_check: hard_stop

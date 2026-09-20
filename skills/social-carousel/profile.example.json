@@ -1,0 +1,19 @@
+{
+  "name": "",
+  "handle": "@",
+  "audience": "",
+  "voice": {"adjectives": [], "sample": ""},
+  "cta": {"type": "none", "phrase": "", "url": "", "keyword": ""},
+  "platforms": ["linkedin", "linkedin_page", "instagram", "facebook"],
+  "linkedin_page_id": null,
+  "facebook_page_id": null,
+  "look": {"preset": "terminal", "bg": "#0B1220", "accent": "#7CF2C8", "type": "condensed"},
+  "slides": 7,
+  "save_slide": true,
+  "hashtags": [],
+  "approval": "review",
+  "face_cover": false,
+  "face_file": null,
+  "anchor": null,
+  "accounts": {}
+}
