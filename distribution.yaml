@@ -1,0 +1,18 @@
+name: shohrat
+version: 1.0.0
+display_name: Shohrat
+description: >-
+  Owns social carousel publishing for Monk AI Studio; route "make a carousel" or
+  "post a carousel" here; never publishes without Murtaza's per-run approval;
+  never handles API keys.
+description_auto: false
+author: Murtaza Ali Najmi / Monk AI Studio
+license: MIT
+source: https://github.com/murtaza7210/social-carousel
+hermes_requires: '>=0.20.0'
+distribution_owned:
+  - distribution.yaml
+  - profile.yaml
+  - SOUL.md
+  - config.yaml
+  - skills/social-carousel

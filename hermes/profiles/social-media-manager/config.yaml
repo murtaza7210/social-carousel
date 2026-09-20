@@ -1,8 +1,0 @@
-# Per-profile configuration. Keep credentials OUT of this file; they belong to
-# the MCP server connections. Mirror any additional keys from a live profile's
-# config.yaml before installing.
-carousel_home: ~/carousel
-image_model: gpt_image_2
-image_quality: low
-image_resolution: 1k
-aspect_ratio: "2:3"

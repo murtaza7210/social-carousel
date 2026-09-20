@@ -1,0 +1,55 @@
+model:
+  default: claude-sonnet-5
+  provider: anthropic
+agent:
+  reasoning_effort: high
+terminal:
+  env_passthrough: []
+  home_mode: profile
+memory:
+  write_approval: true
+delegation:
+  subagent_auto_approve: false
+skills:
+  write_approval: true
+curator:
+  consolidate: false
+approvals:
+  mode: manual
+  cron_mode: deny
+  single_query_mode: deny
+  deny:
+    # secrets and process environment
+    - '*printenv*'
+    - '*env |*'
+    - '*cat *.env*'
+    - '*cat */.env*'
+    - '*/proc/*/environ*'
+    - '*auth.json*'
+    - '*config.yaml*'
+    # other profiles, the shared brain, and the kanban store are reached only through hermes tools
+    - '*/opt/data/profiles/*'
+    - '*/opt/data/shared-brain/*'
+    - '*kanban.db*'
+    - '*/opt/data/SOUL.md*'
+    - '*/opt/data/memories*'
+    # docker, ssh, package managers, interpreters that could reach outside the job
+    - '*docker*'
+    - '*ssh *'
+    - '*scp *'
+    - '*apt *'
+    - '*apt-get*'
+    - '*pip install*'
+    - '*npm *'
+    - '*npx *'
+    # network: only curl to the publishing pipeline is expected (SOUL names the hosts);
+    # globs cannot express an allowlist, so everything else runs under manual approval
+    - '*curl*-X DELETE*'
+    - '*wget*'
+    - '*nc *'
+    - '*ncat*'
+    - '*telnet*'
+security:
+  redact_secrets: true
+mcp_servers: {}
+_config_version: 44

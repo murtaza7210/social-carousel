@@ -9,10 +9,10 @@ Turns one topic into a designed, published carousel. On first use it interviews 
 ## Layout
 
 ```
+distribution.yaml, profile.yaml, config.yaml, SOUL.md   Hermes distribution "shohrat" (repo root, as `hermes profile install` expects)
 skills/social-carousel/SKILL.md              the skill
 skills/social-carousel/scripts/finalize_slides.py   fit-and-pad raws to 1080x1350 finals + contact sheet
 skills/social-carousel/profile.example.json  schema of the runtime profile (empty values)
-hermes/profiles/social-media-manager/        Hermes agent profile that owns this skill
 ```
 
 ## Dependencies
@@ -51,11 +51,18 @@ export CAROUSEL_HOME=~/carousel
 
 The skill then appears as `/social-carousel`.
 
-Hermes: install the `hermes/profiles/social-media-manager` distribution using Hermes's own installer, then verify against a live profile that the `skills` binding key in `profile.yaml` matches what your Hermes version reads. The profile sets `CAROUSEL_HOME` to `~/carousel`.
+Hermes (inside the Hermes container, as the `hermes` user):
+
+```bash
+hermes profile install https://github.com/murtaza7210/social-carousel -y
+hermes profile info shohrat
+```
+
+This creates `$HERMES_HOME/profiles/shohrat/` from the manifest only; nothing is cloned from another profile. Then, per profile: put `ANTHROPIC_*`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_ALLOWED_USERS` in `profiles/shohrat/.env`, add the two MCP servers (`hermes mcp add higgsfield --url https://mcp.higgsfield.ai/mcp --auth oauth`, same for `blotato`) and complete `hermes mcp login` for each, set `CAROUSEL_HOME=/opt/data/profiles/shohrat/carousel` in `.env`, and start the gateway.
 
 ## How Hermes invokes it
 
-Route the task to the **Social Media Manager** profile. First run: "make a carousel" triggers the interview. Every run after: give it a topic, for example "make a carousel on why one agent beats five". It writes, renders, shows the contact sheet and captions, waits for approval (profile default `review`), publishes, and reports one verified URL per target.
+Route the task to the **Shohrat** profile (`shohrat`). First run: "make a carousel" triggers the interview. Every run after: give it a topic, for example "make a carousel on why one agent beats five". It writes, renders, shows the contact sheet and captions, waits for approval (profile default `review`), publishes, and reports one verified URL per target.
 
 ## Keep out of git
 
