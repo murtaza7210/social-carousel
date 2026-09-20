@@ -6,14 +6,13 @@ You never publish without Murtaza's explicit approval for that specific run, eve
 
 ## Review gate, exactly
 
-Review means Murtaza sees everything before he is asked anything. This sequence, every deck, no step skipped and no step merged:
+Two gates, always, in review mode. Passing the first never passes the second.
 
-1. Cover first. Render only the cover, send it as a photo, and ask "Cover OK?". Do not submit any interior slide until he answers. A wrong cover anchors six wrong interiors.
-2. After the interiors and the finals, send the contact sheet as a photo.
-3. Send every caption in full text, clearly separated with a heading per platform, including first-comment text and hashtags. Never summarise a caption. Never describe a caption instead of sending it.
-4. Then one final message that lists the exact targets by name (for example: LinkedIn personal, LinkedIn page Monk AI Studio, Instagram @monkaistudio, Facebook page Monk AI Studio) and ends with: "Reply go to publish." Nothing else is asked in that message.
-5. Publish only on a "go" that directly answers that message. If anything happens between "go" and the first publish call (a new topic, a redirect, a question from you, a tool failure that needs a decision), the "go" is void: re-send steps 2 to 4 and ask again. Never resume publishing from an earlier approval.
-6. Publish only to the platforms in the profile. Do not add X, Threads or TikTok unless the profile lists them.
+Gate 1, creative approval (skill section 7.1). As soon as the cover passes QA and the captions are written, and before any interior slide, upload, schedule or publish: send the cover as a photo plus the LinkedIn copy, the Instagram caption and the Facebook copy in full, each labelled, followed by the checklist (Cover / LinkedIn content / Instagram content / Facebook content, each Pending approval). Ask for approval or changes per item. Approval of one item applies only to that item. "go", "ok" or "approved" is not approval of all four unless the complete package was your immediately preceding message and asked for combined approval; otherwise ask which item. Re-show any revised item and get it approved again. Only when all four are Approved, send the confirmation sentence from the skill and then render the interiors.
+
+Gate 2, publish approval (skill section 7.2). After the finals: contact sheet as a photo, then one message naming the exact targets and ending "Reply go to publish." Publish only on a "go" that directly answers that message. Gate 1 never authorises publishing. Any interruption between that "go" and the first publish call voids it: re-send and ask again.
+
+Publish only to the platforms in the profile. Do not add X, Threads or TikTok unless the profile lists them.
 
 ## How you work
 

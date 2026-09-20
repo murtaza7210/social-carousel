@@ -1,6 +1,6 @@
 ---
 name: social-carousel
-description: Interview-first carousel publisher. On first use it interviews the user (brand, handle, audience, voice, look, call to action, platforms, approval mode) and saves a profile. On every run it asks for a topic, writes a 6 to 8 slide deck, renders the slides with Higgsfield gpt_image_2 on a style-anchor chain, builds 1080x1350 finals, writes per-platform captions, and publishes through Blotato (MCP server, plugin, or REST API key) to LinkedIn, X, Instagram, TikTok, Facebook, or Threads, then verifies the live post URLs. LinkedIn always goes to both the personal profile and the configured company page. Refuses to draft an angle that overlaps carousel/post-log.md. Use for any "make a carousel" or "post a carousel" request. Not for video, reels, or single-image posts.
+description: Interview-first carousel publisher. On first use it interviews the user (brand, handle, audience, voice, look, call to action, platforms, approval mode) and saves a profile. On every run it asks for a topic, writes a 6 to 8 slide deck, renders the slides with Higgsfield gpt_image_2 on a style-anchor chain, builds 1080x1350 finals, writes per-platform captions, and publishes through Blotato (MCP server, plugin, or REST API key) to LinkedIn, X, Instagram, TikTok, Facebook, or Threads, then verifies the live post URLs. LinkedIn always goes to both the personal profile and the configured company page. Refuses to draft an angle that overlaps carousel/post-log.md. Two separate approval gates, the cover plus all three platform copies before any interior slide, then a distinct go before publishing. Use for any "make a carousel" or "post a carousel" request. Not for video, reels, or single-image posts.
 metadata:
   short-description: Interview, design, render and publish social carousels
 ---
@@ -127,13 +127,13 @@ Every slide: `model: "gpt_image_2"`, `aspect_ratio: "2:3"` (or `"3:4"`; use `"1:
    ```
 
    Expect 200, then `media_confirm` with the returned `media_id` and `type: "image"`. On the first deck there is no anchor: render the cover with no reference at `quality: "medium"`.
-2. Cover: one `generate_image` call with the cover prompt and `medias: [{"role": "image", "value": "<anchor media_id>"}]`. Note its `job_id` and result URL, and download the result:
+2. Cover: one `generate_image` call with the cover prompt and `medias: [{"role": "image", "value": "<anchor media_id>"}]`. Note its `job_id` and result URL, and download the result. QA the cover (read every word). Then STOP: write the captions (section 6) and run the creative approval gate (section 7.1). Do not submit any interior slide until all four creative items are approved:
 
    ```bash
    curl -sL -o cover-raw.png "<result url>"
    ```
 
-3. Interiors: one `generate_image_batch` (up to 12 requests, `index` 2 upward) with the value, save-trigger and CTA prompts, and `medias: [{"role": "image", "value": "<cover job_id>"}]` on every request, so the new cover anchors its own interiors. Poll `jobs_wait` until `all_terminal` is true, then call `show_generation_by_ids` once for the whole set. Download each as `slide2-raw.png`, `slide3-raw.png`, and so on.
+3. Interiors (only after section 7.1 records all four approvals): one `generate_image_batch` (up to 12 requests, `index` 2 upward) with the value, save-trigger and CTA prompts, and `medias: [{"role": "image", "value": "<cover job_id>"}]` on every request, so the new cover anchors its own interiors. Poll `jobs_wait` until `all_terminal` is true, then call `show_generation_by_ids` once for the whole set. Download each as `slide2-raw.png`, `slide3-raw.png`, and so on.
 4. QA: open every raw and read every word. Zoom into the CTA line.
 
 | Problem | Fix |
@@ -143,7 +143,7 @@ Every slide: `model: "gpt_image_2"`, `aspect_ratio: "2:3"` (or `"3:4"`; use `"1:
 | off-style: wrong colours, a photo, a person, layout drift | regenerate that slide with the anchor again |
 | a slide still wrong after two fixes | stop and show the user, do not publish |
 
-After the deck is approved, write the new cover's path into `profile.anchor` so the next deck matches this one.
+After the deck passes 7.2 and is published, write the new cover's path into `profile.anchor` so the next deck matches this one.
 
 ## 5. Finals
 
@@ -151,7 +151,7 @@ Run `python3 <skill dir>/scripts/finalize_slides.py --dir <deck folder>` (add `-
 
 ## 6. Captions
 
-Write in the profile voice: the adjectives, the sample paragraph, the reader as the protagonist ("you"), short sentences, concrete numbers. One caption per platform:
+Write the captions as soon as the cover has passed QA, before any interior slide exists: they are reviewed together with the cover in section 7.1. Write in the profile voice: the adjectives, the sample paragraph, the reader as the protagonist ("you"), short sentences, concrete numbers. One caption per platform:
 
 | Platform | Caption |
 |---|---|
@@ -164,9 +164,46 @@ Write in the profile voice: the adjectives, the sample paragraph, the reader as 
 
 Hygiene rules, unless the user's voice sample clearly does otherwise: no em dashes and no emojis placed next to each other (both read as machine-written); do not mention how the slides were produced; do turn on the platform's AI-disclosure flag where one exists (TikTok `isAiGenerated: true`); never "link in bio".
 
-## 7. Approval gate
+## 7. Approval gates
 
-`approval: "review"`: show the contact sheet (or the slide files) and every caption, then wait for "go" or edits, and apply edits before posting. `approval: "auto"`: continue without stopping. In both modes never post a deck that failed QA.
+There are two gates in review mode, and they are separate. Passing the first never passes the second. `approval: "auto"` skips both; in both modes never post a deck that failed QA.
+
+### 7.1 Creative approval (before any interior slide, upload, schedule, or publish)
+
+As soon as the cover has passed QA and the captions are written, present these four items together, each clearly labelled, in full (the cover as a photo, each caption as its complete text including first-comment line and hashtags):
+
+1. Cover design
+2. LinkedIn post copy
+3. Instagram caption
+4. Facebook post copy
+
+Directly under them show this checklist, then ask the user to approve or request changes for each item:
+
+```
+Cover: Pending approval
+LinkedIn content: Pending approval
+Instagram content: Pending approval
+Facebook content: Pending approval
+```
+
+Rules:
+
+- All four items require explicit approval. Approval of one item applies only to that item. "Cover approved" approves the cover and nothing else.
+- A generic reply ("go", "ok", "approved", "yes") is NOT approval of all four unless the complete four-item package was the immediately preceding message and it asked for combined approval in so many words. Otherwise ask which item the reply refers to.
+- When an item is revised, show the revised item again and obtain approval for it; the other three keep their state.
+- Keep the checklist current: re-send it with each item's state (Pending approval / Approved) after every change.
+- Do not generate interior slides, and do not upload, schedule, or publish anything, until all four read Approved.
+- If the profile's platform set is not exactly LinkedIn, Instagram, Facebook, the list has one copy item per platform in the profile; the rules do not change.
+
+When all four are approved, send exactly this confirmation and only then continue to section 4 step 3:
+
+```
+All four creative items are approved: cover, LinkedIn content, Instagram content, and Facebook content. I will now generate and QA the interior slides. Nothing will be published without final approval.
+```
+
+### 7.2 Publish approval (after the finals)
+
+Show the contact sheet, then one message that lists the exact targets by name and ends with "Reply go to publish." Publish only on a "go" that directly answers that message. Creative approval in 7.1 never authorises publishing. If anything interrupts between that "go" and the first publish call (a new topic, a redirect, a question, a tool failure needing a decision), the "go" is void: re-send the contact sheet and the targets message and ask again. Apply any caption edits before posting and show the edited caption first.
 
 ## 8. Publish with Blotato
 
