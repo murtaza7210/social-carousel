@@ -27,8 +27,15 @@ approvals:
     - '*/proc/*/environ*'
     - '*auth.json*'
     - '*config.yaml*'
-    # other profiles, the shared brain, and the kanban store are reached only through hermes tools
-    - '*/opt/data/profiles/*'
+    # other profiles (listed explicitly: a glob cannot exclude this profile's own directory),
+    # the shared brain, and the kanban store are reached only through hermes tools
+    - '*/profiles/adnan*'
+    - '*/profiles/sehat*'
+    - '*/profiles/watson*'
+    - '*/profiles/probe*'
+    - '*/profiles/socrates*'
+    - '*/profiles/default*'
+    - '*/profiles/.deleted*'
     - '*/opt/data/shared-brain/*'
     - '*kanban.db*'
     - '*/opt/data/SOUL.md*'
@@ -51,5 +58,21 @@ approvals:
     - '*telnet*'
 security:
   redact_secrets: true
-mcp_servers: {}
+mcp_servers:
+  higgsfield:
+    url: https://mcp.higgsfield.ai/mcp
+    auth: oauth
+    oauth:
+      flow: browser
+    enabled: true
+    timeout: 120
+    connect_timeout: 60
+  blotato:
+    url: https://mcp.blotato.com/mcp
+    auth: oauth
+    oauth:
+      flow: browser
+    enabled: true
+    timeout: 120
+    connect_timeout: 60
 _config_version: 44
