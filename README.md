@@ -72,3 +72,7 @@ Route the task to the **Shohrat** profile (`shohrat`). First run: "make a carous
 - `.env` files
 
 Credentials never enter the skill at all; they live in the MCP server connections.
+
+## Operations
+
+Runtime notes for the deployed profile (per-profile `.env` keys including `API_SERVER_PORT=8648`, gateway registration, the egress limitation, and rollback): [docs/OPERATIONS.md](docs/OPERATIONS.md). Egress-fence test plan, not applied: [docs/EGRESS-FENCE-TEST-PLAN.md](docs/EGRESS-FENCE-TEST-PLAN.md).
