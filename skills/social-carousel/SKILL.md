@@ -20,6 +20,34 @@ If either service is missing, stop and tell the user how to connect it. Never su
 
 All runtime state (profile, post log, deck folders) lives in one directory, `$CAROUSEL_HOME`. Read the `CAROUSEL_HOME` environment variable; when it is unset, use `./carousel` under the current working folder. Every `carousel/...` path in this document means `$CAROUSEL_HOME/...`. Create the directory on first use. Never commit its contents to git: it holds account ids, the brand profile, and generated images. `profile.example.json` next to this file documents the profile schema.
 
+## 0.1 Approval guard (mechanical enforcement — you MUST invoke it)
+
+This skill's approval rules are enforced by `scripts/approval_guard.py`, not by prose alone.
+Honest scope: this is **detection + task-completion enforcement, NOT hard prevention** of MCP
+tool calls. The guard cannot physically stop a Higgsfield/Blotato MCP call; it (a) tells you
+whether a gate is satisfied, (b) records a VIOLATION and raises `alert_zubi` if you invoke an
+interior-generation or publishing tool before its approval, and (c) refuses to bless task
+completion until every approval and every section-10 record field is present. A true fail-closed
+design is documented in `docs/FAIL-CLOSED-WRAPPER.md` and is NOT active.
+
+State lives at `<deck>/approval_state.json` (schema: `approval_state.example.json`). You MUST:
+
+- **On deck creation (§3):** copy `approval_state.example.json` to `<deck>/approval_state.json`, set `task_id`.
+- **Record each approval the moment the user grants it:** set that item's
+  `state:"approved"` and `ref:"<message id / quote / timestamp that granted it>"`. An approval
+  with no `ref` does not count.
+- **Before submitting ANY interior-generation tool call (§4 step 3):** run
+  `python3 scripts/approval_guard.py --state <deck>/approval_state.json gate-interiors`.
+  Exit 0 = proceed; exit 2 = STOP, creative approval incomplete.
+- **Before ANY interior or publish MCP tool call:** run
+  `... check-action --tool <toolname>`. If it returns `alert_zubi:true`, STOP, do not proceed,
+  and surface the violation to Zubi (comment on the Kanban task); the violation is now recorded
+  and will block task completion until resolved.
+- **Before publishing (§7.2 / §8):** run `... gate-publish`. Exit 0 required.
+- **Before marking the Kanban task complete (§10):** fill `completion_record`, then run
+  `... validate-completion`. Exit 0 is MANDATORY to complete the task; exit 2 lists missing
+  fields — the task MUST NOT be completed until it returns ok.
+
 ## 1. First run: the interview
 
 If `carousel/profile.json` exists in the working folder, load it and go to section 2. Otherwise interview the user before doing anything else. Ask everything in one message, accept partial answers, fill sensible defaults for anything skipped, confirm the profile back as a short table, then save it.
@@ -133,7 +161,10 @@ Every slide: `model: "gpt_image_2"`, `aspect_ratio: "2:3"` (or `"3:4"`; use `"1:
    curl -sL -o cover-raw.png "<result url>"
    ```
 
-3. Interiors (only after section 7.1 records all four approvals): one `generate_image_batch` (up to 12 requests, `index` 2 upward) with the value, save-trigger and CTA prompts, and `medias: [{"role": "image", "value": "<cover job_id>"}]` on every request, so the new cover anchors its own interiors. Poll `jobs_wait` until `all_terminal` is true, then call `show_generation_by_ids` once for the whole set. Download each as `slide2-raw.png`, `slide3-raw.png`, and so on.
+3. Interiors (only after section 7.1 records all four approvals): FIRST run
+   `python3 scripts/approval_guard.py --state <deck>/approval_state.json gate-interiors`
+   (exit 0 required) and `... check-action --tool generate_image_batch` (must not raise
+   `alert_zubi`). Only then submit one `generate_image_batch` (up to 12 requests, `index` 2 upward) with the value, save-trigger and CTA prompts, and `medias: [{"role": "image", "value": "<cover job_id>"}]` on every request, so the new cover anchors its own interiors. Poll `jobs_wait` until `all_terminal` is true, then call `show_generation_by_ids` once for the whole set. Download each as `slide2-raw.png`, `slide3-raw.png`, and so on.
 4. QA: open every raw and read every word. Zoom into the CTA line.
 
 | Problem | Fix |
@@ -266,7 +297,14 @@ Never write "link in the comments" for a comment that has not been confirmed.
 
 Publish-verification law: a platform counts as published ONLY when its post URL appears in a tool result or API response. Never report a URL from memory. End every run with one list-posts call and check that every intended platform shows `published` and none show `failed`. Blotato cannot delete a published post, so a wrong post is worse than no post: when QA, hosting, or posting fails, stop, keep the deck folder, and say exactly what broke.
 
-Append one row to `carousel/post-log.md` (date, platforms, topic, anchor used, URLs, first-comment status) and report:
+Append one row to `carousel/post-log.md` (date, platforms, topic, anchor used, URLs, first-comment status).
+
+Then fill `<deck>/approval_state.json` `completion_record` with the section-10 schema
+(approval_reference, and per-platform post_id, status, published_at, url — all from tool
+results, never memory) and run
+`python3 scripts/approval_guard.py --state <deck>/approval_state.json validate-completion`.
+**Exit 0 is mandatory before you may mark the Kanban task complete.** If it returns exit 2,
+the record is incomplete: fix the listed fields; do NOT complete the task. Then report:
 
 ```
 Topic: ...

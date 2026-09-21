@@ -1,0 +1,21 @@
+{
+  "task_id": "t_example",
+  "approvals": {
+    "cover":     {"state": "pending", "ref": "", "at": ""},
+    "linkedin":  {"state": "pending", "ref": "", "at": ""},
+    "instagram": {"state": "pending", "ref": "", "at": ""},
+    "facebook":  {"state": "pending", "ref": "", "at": ""},
+    "publish":   {"state": "pending", "ref": "", "at": ""}
+  },
+  "actions": [],
+  "completion_record": {
+    "approval_reference": "",
+    "posts": [
+      {"platform": "linkedin",      "post_id": "", "status": "", "published_at": "", "url": ""},
+      {"platform": "linkedin_page", "post_id": "", "status": "", "published_at": "", "url": ""},
+      {"platform": "instagram",     "post_id": "", "status": "", "published_at": "", "url": ""},
+      {"platform": "facebook",      "post_id": "", "status": "", "published_at": "", "url": ""}
+    ]
+  },
+  "violations": []
+}
